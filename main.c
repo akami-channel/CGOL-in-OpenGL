@@ -106,7 +106,7 @@ int main (int argc, char* argv[]){
     screen_width_float = (float) screen_width_int;
     screen_height_float = (float) screen_height_int;
 
-    cells = (Cell*) malloc(sizeof(Cell) * screen_total_num_tiles_int);
+    cells = malloc(sizeof(Cell) * screen_total_num_tiles_int);
     for(int i = 0; i < screen_total_num_tiles_int; i++){
         cells[i].is_alive = rand() % 2;
     }
@@ -118,7 +118,7 @@ int main (int argc, char* argv[]){
         cells[i].trans.y = cells[i].y;
     }
 
-    cells_copy = (Cell*) malloc(sizeof(Cell) * screen_total_num_tiles_int);
+    cells_copy = malloc(sizeof(Cell) * screen_total_num_tiles_int);
     for(int i = 0; i < screen_total_num_tiles_int; i++){
         cells_copy[i].is_alive = cells[i].is_alive;
         cells_copy[i].x = cells[i].x;
@@ -273,7 +273,7 @@ int main (int argc, char* argv[]){
         // printf("\n");
 
         
-        printf("starting\n");
+        // printf("starting\n");
         for(int i = 0; i < screen_total_num_tiles_int; i++){
             
             int neighbor_count = 0;
@@ -343,7 +343,7 @@ int main (int argc, char* argv[]){
 
         // printf("deltaTime: %f\n", deltaTime);
         // printf(".01666 - deltaTime: %f\n", .01666 - deltaTime);
-        printf("framerate: %f\n", 1.0 / deltaTime);
+        // printf("framerate: %f\n", 1.0 / deltaTime);
 
         // manually setting framerate to about 60
         // float framerate = 60.0;

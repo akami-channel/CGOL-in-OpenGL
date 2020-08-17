@@ -31,7 +31,7 @@ int get_i_from_x_and_y (ivec2 input_vec){
 }
 
 int get_up(ivec2 input_vec){
-	ivec2 new_ivec2 = {input_vec.x, input_vec.y +1};
+	ivec2 new_ivec2 = {input_vec.x, input_vec.y + 1};
 	new_ivec2 = yield(new_ivec2);
 	int new_i = get_i_from_x_and_y(new_ivec2);
 	return cells[new_i].is_alive;
