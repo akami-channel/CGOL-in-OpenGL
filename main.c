@@ -68,11 +68,6 @@ typedef struct Rectangle {
     Color color;
 } Rectangle;
 
-typedef struct Cell {
-    int x, y;
-    int is_alive; // bool; 0 or 1
-} Cell;
-
 typedef struct vec2 {
     float x, y;
 } vec2;
@@ -80,6 +75,12 @@ typedef struct vec2 {
 typedef struct ivec2 {
     int x, y;
 } ivec2;
+
+typedef struct Cell {
+    int x, y;
+    int is_alive; // bool; 0 or 1
+    ivec2 trans;
+} Cell;
 
 int check_collision(Rectangle* r1, Rectangle* r2);
 GLuint textured_quad_shader; // defined here bc used in the draw_rect function
@@ -92,10 +93,10 @@ int screen_total_num_tiles_int;
 float screen_width_float = 0.0;
 float screen_height_float = 0.0;
 
-#include "headers/cgol_functions.h"
-
 Cell *cells;
 Cell *cells_copy;
+
+#include "headers/cgol_functions.h"
 
 int main (int argc, char* argv[]){
 
@@ -113,6 +114,8 @@ int main (int argc, char* argv[]){
     for(int i = 0; i < screen_total_num_tiles_int; i++){
         cells[i].x = get_x_from_i(i);
         cells[i].y = get_y_from_i(i);
+        cells[i].trans.x = cells[i].x;
+        cells[i].trans.y = cells[i].y;
     }
 
     cells_copy = (Cell*) malloc(sizeof(Cell) * screen_total_num_tiles_int);
@@ -120,6 +123,8 @@ int main (int argc, char* argv[]){
         cells_copy[i].is_alive = cells[i].is_alive;
         cells_copy[i].x = cells[i].x;
         cells_copy[i].y = cells[i].y;
+        cells_copy[i].trans.x = cells[i].trans.x;
+        cells_copy[i].trans.y = cells[i].trans.y;
     }
 
     // for debugging the cgol_functions:
@@ -270,10 +275,19 @@ int main (int argc, char* argv[]){
         
         printf("starting\n");
         for(int i = 0; i < screen_total_num_tiles_int; i++){
-            ivec2 input_vec = {cells[i].x+1, cells[i].y-1};
-            ivec2 corrected_vec = yield(input_vec);
-            int new_i = get_i_from_x_and_y(corrected_vec);
-            cells_copy[i].is_alive = cells[new_i].is_alive;
+            
+            int neighbor_count = 0;
+
+            cells_copy[i].is_alive = 0;
+            if(get_right(cells[i].trans) == 1) neighbor_count++;
+            if(get_left(cells[i].trans) == 1) neighbor_count++;
+            if(get_down(cells[i].trans) == 1) neighbor_count++;
+            if(get_up(cells[i].trans) == 1) neighbor_count++;
+            if(get_down_right(cells[i].trans) == 1) neighbor_count++;
+            if(get_up_right(cells[i].trans) == 1) neighbor_count++;
+            if(get_down_left(cells[i].trans) == 1) neighbor_count++;
+            if(get_up_left(cells[i].trans) == 1) neighbor_count++;
+            // cells_copy[i].is_alive = cells[new_i].is_alive;
 
             // printf("cells[i].x: %d, cells[i].y: %d\n", cells[i].x, cells[i].y);
             // printf("input_vec x: %d, corrected x: %d\n", input_vec.x, corrected_vec.x);
@@ -283,6 +297,9 @@ int main (int argc, char* argv[]){
             // printf("i: %d\n", i);
             // printf("new_i: %d\n", new_i);
             // printf("\n");
+
+            if (cells[i].is_alive && neighbor_count == 2) cells_copy[i].is_alive = 1;
+            if (neighbor_count == 3) cells_copy[i].is_alive = 1;
         }
 
         for(int i = 0; i < screen_total_num_tiles_int; i++){
@@ -332,7 +349,7 @@ int main (int argc, char* argv[]){
         // float framerate = 60.0;
         // usleep( (int) ( .01666 - deltaTime) * 1000000.0 );
 
-        usleep(1000000);
+        usleep(100000);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

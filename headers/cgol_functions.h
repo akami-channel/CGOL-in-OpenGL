@@ -29,3 +29,59 @@ int get_y_from_i (int i){
 int get_i_from_x_and_y (ivec2 input_vec){
 	return input_vec.x + screen_width_int * input_vec.y;
 }
+
+int get_up(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x, input_vec.y +1};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_down(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x, input_vec.y - 1};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_right(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x + 1, input_vec.y};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_left(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x - 1, input_vec.y};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_up_right(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x + 1, input_vec.y + 1};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_down_right(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x + 1, input_vec.y - 1};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_up_left(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x - 1, input_vec.y + 1};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
+
+int get_down_left(ivec2 input_vec){
+	ivec2 new_ivec2 = {input_vec.x - 1, input_vec.y - 1};
+	new_ivec2 = yield(new_ivec2);
+	int new_i = get_i_from_x_and_y(new_ivec2);
+	return cells[new_i].is_alive;
+}
