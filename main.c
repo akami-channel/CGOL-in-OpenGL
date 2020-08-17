@@ -86,8 +86,8 @@ GLuint textured_quad_shader; // defined here bc used in the draw_rect function
 void draw_rect(Rectangle r1, GLuint shader);
 void draw_window_shader(GLuint shader, float scr_width_float, float scr_height_float);
 
-int screen_width_int = 6;
-int screen_height_int = 6;
+int screen_width_int = 60;
+int screen_height_int = 60;
 int screen_total_num_tiles_int;
 float screen_width_float = 0.0;
 float screen_height_float = 0.0;
@@ -260,21 +260,17 @@ int main (int argc, char* argv[]){
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // printf("Printing cells[i].is_alive for all cells \n");
         // for(int i = 0; i < screen_total_num_tiles_int; i++){
-        //     cells_copy[i].is_alive = cells[i].is_alive;
+        //     if( i % screen_width_int == 0) printf("\n");
+        //     printf("%d, ", cells[i].is_alive);         
         // }
-
-        printf("Printing cells[i].is_alive for all cells \n");
-        for(int i = 0; i < screen_total_num_tiles_int; i++){
-            if( i % screen_width_int == 0) printf("\n");
-            printf("%d, ", cells[i].is_alive);         
-        }
-        printf("\n");
+        // printf("\n");
 
         
         printf("starting\n");
         for(int i = 0; i < screen_total_num_tiles_int; i++){
-            ivec2 input_vec = {cells[i].x, cells[i].y+1};
+            ivec2 input_vec = {cells[i].x+1, cells[i].y-1};
             ivec2 corrected_vec = yield(input_vec);
             int new_i = get_i_from_x_and_y(corrected_vec);
             cells_copy[i].is_alive = cells[new_i].is_alive;
@@ -289,20 +285,17 @@ int main (int argc, char* argv[]){
             // printf("\n");
         }
 
-
-
-        sleep(1);
         for(int i = 0; i < screen_total_num_tiles_int; i++){
             cells[i].is_alive = cells_copy[i].is_alive;
         }
 
-        printf("Printing cells[i].is_alive again for all cells \n");
-        for(int i = 0; i < screen_total_num_tiles_int; i++){
-            if( i % screen_width_int == 0) printf("\n");
-            printf("%d, ", cells[i].is_alive);         
-        }
-        printf("\n");
-// exit(0);
+        // printf("Printing cells[i].is_alive again for all cells \n");
+        // for(int i = 0; i < screen_total_num_tiles_int; i++){
+        //     if( i % screen_width_int == 0) printf("\n");
+        //     printf("%d, ", cells[i].is_alive);         
+        // }
+        // printf("\n");
+
         for(int i = 0; i < screen_total_num_tiles_int; i++){ 
             int x = i % screen_width_int;
             int y = floor(i / screen_width_float);
@@ -339,7 +332,7 @@ int main (int argc, char* argv[]){
         // float framerate = 60.0;
         // usleep( (int) ( .01666 - deltaTime) * 1000000.0 );
 
-        // usleep(1000000);
+        usleep(1000000);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -351,6 +344,8 @@ int main (int argc, char* argv[]){
     glDeleteProgram(resting_sprite_shader);
     glDeleteProgram(walking_zombie_shader);
     glDeleteProgram(colored_quad_shader);
+    free(cells);
+    free(cells_copy);
     // glfw: terminate, clearing all previously allocated GLFW resources.
     glfwTerminate();
 
