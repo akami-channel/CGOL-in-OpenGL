@@ -18,7 +18,7 @@
 
 #define FALSE 0
 #define TRUE 1
-#define FULLSCREEN TRUE
+#define FULLSCREEN FALSE
 #define WRITING_TO_DISK TRUE
 
 GLuint initial_screen_width = 600, initial_screen_height = 600;
@@ -68,6 +68,11 @@ typedef struct Rectangle {
     Color color;
 } Rectangle;
 
+typedef struct Cell {
+    int x, y;
+    int is_alive; // bool; 0 or 1
+} Cell;
+
 typedef struct vec2 {
     float x, y;
 } vec2;
@@ -89,9 +94,8 @@ float screen_height_float = 0.0;
 
 #include "headers/cgol_functions.h"
 
-int *cells;
-int *cells_copy;
-
+Cell *cells;
+Cell *cells_copy;
 
 int main (int argc, char* argv[]){
 
@@ -101,16 +105,29 @@ int main (int argc, char* argv[]){
     screen_width_float = (float) screen_width_int;
     screen_height_float = (float) screen_height_int;
 
-    cells = malloc(sizeof(int) * screen_total_num_tiles_int);
+    cells = (Cell*) malloc(sizeof(Cell) * screen_total_num_tiles_int);
     for(int i = 0; i < screen_total_num_tiles_int; i++){
-        cells[i] = rand() % 2;
+        cells[i].is_alive = rand() % 2;
     }
 
-    cells_copy = malloc(sizeof(int) * screen_total_num_tiles_int);
     for(int i = 0; i < screen_total_num_tiles_int; i++){
-        cells_copy[i] = cells[i];
+        cells[i].x = get_x_from_i(i);
+        cells[i].y = get_y_from_i(i);
     }
 
+    cells_copy = (Cell*) malloc(sizeof(Cell) * screen_total_num_tiles_int);
+    for(int i = 0; i < screen_total_num_tiles_int; i++){
+        cells_copy[i].is_alive = cells[i].is_alive;
+        cells_copy[i].x = cells[i].x;
+        cells_copy[i].y = cells[i].y;
+    }
+
+    // for debugging the cgol_functions:
+    // for(int i = 0; i < screen_total_num_tiles_int; i++){
+    //     printf("x: %d, y: %d\n", cells[i].x, cells[i].y);
+    //     ivec2 input_vec = {cells[i].x, cells[i].y};
+    //     printf("get_i_from_x_and_y: %d\n", get_i_from_x_and_y(input_vec) );
+    // }
 
     if(argc >= 2) total_prints_this_batch = atoi(argv[1]);
     if(argc >= 3) num_frames_to_print = atoi(argv[2]);
@@ -240,13 +257,52 @@ int main (int argc, char* argv[]){
         glfwGetWindowSize(window, &window_width, &window_height);
         glViewport(0, 0, window_width, window_height);
 
-//         // glClearColor(0.3f, 0.9f, 0.2f, 1.0f);
-//         // glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
+        // for(int i = 0; i < screen_total_num_tiles_int; i++){
+        //     cells_copy[i].is_alive = cells[i].is_alive;
+        // }
+
+        printf("Printing cells[i].is_alive for all cells \n");
         for(int i = 0; i < screen_total_num_tiles_int; i++){
-            ;
+            if( i % screen_width_int == 0) printf("\n");
+            printf("%d, ", cells[i].is_alive);         
+        }
+        printf("\n");
+
+        
+        printf("starting\n");
+        for(int i = 0; i < screen_total_num_tiles_int; i++){
+            ivec2 input_vec = {cells[i].x, cells[i].y+1};
+            ivec2 corrected_vec = yield(input_vec);
+            int new_i = get_i_from_x_and_y(corrected_vec);
+            cells_copy[i].is_alive = cells[new_i].is_alive;
+
+            // printf("cells[i].x: %d, cells[i].y: %d\n", cells[i].x, cells[i].y);
+            // printf("input_vec x: %d, corrected x: %d\n", input_vec.x, corrected_vec.x);
+            // printf("input_vec y: %d, corrected y: %d\n", input_vec.y, corrected_vec.y);
+            // printf("cells[i].alive: %d\n", cells[i].is_alive);
+            // printf("cells[new_i].is_alive: %d\n", cells[new_i].is_alive);
+            // printf("i: %d\n", i);
+            // printf("new_i: %d\n", new_i);
+            // printf("\n");
         }
 
+
+
+        sleep(1);
+        for(int i = 0; i < screen_total_num_tiles_int; i++){
+            cells[i].is_alive = cells_copy[i].is_alive;
+        }
+
+        printf("Printing cells[i].is_alive again for all cells \n");
+        for(int i = 0; i < screen_total_num_tiles_int; i++){
+            if( i % screen_width_int == 0) printf("\n");
+            printf("%d, ", cells[i].is_alive);         
+        }
+        printf("\n");
+// exit(0);
         for(int i = 0; i < screen_total_num_tiles_int; i++){ 
             int x = i % screen_width_int;
             int y = floor(i / screen_width_float);
@@ -255,16 +311,35 @@ int main (int argc, char* argv[]){
             glUniform2f(glGetUniformLocation(colored_quad_shader, "trans"), (float)x * width - 1.0, (float)y * height - 1.0);
             glUniform2f(glGetUniformLocation(colored_quad_shader, "scale"), width, height);
             glUniform4f(glGetUniformLocation(colored_quad_shader, "color"), (float)x * width / 2.0, (float)y * height / 2.0, 1.0, 1.0);
-            if(cells[i] == 1) glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            if(cells[i].is_alive == 1) glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            // if(x == 1 && y == 1) glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);    
         }
 
+// int accepted_x[2] = {3,4};
+        // int accepted_y[2] = {5,6};
+        // for(int i = 0; i < 31000; i++){ // 230 x 135 = 31050
+        //     int x = i % 230;
+        //     int y = floor(i / 230.0);
+        //     float width = 2.0 / 230.0;
+        //     float height = 2.0 / 135.0; 
+        //     glUniform2f(glGetUniformLocation(colored_quad_shader, "trans"), (float)x * width - 1.0, (float)y * height - 1.0);
+        //     glUniform2f(glGetUniformLocation(colored_quad_shader, "scale"), width, height);
+        //     glUniform4f(glGetUniformLocation(colored_quad_shader, "color"), (float)x * width / 2.0, (float)y * height / 2.0, r1.color.b, r1.color.a);
+        //     // if(x == accepted_x[0] && (int) y == accepted_y[1]) glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);    
+        // }
+        
+
         // printf("deltaTime: %f\n", deltaTime);
         // printf(".01666 - deltaTime: %f\n", .01666 - deltaTime);
-        // printf("framerate: %f\n", 1.0 / deltaTime);
+        printf("framerate: %f\n", 1.0 / deltaTime);
 
         // manually setting framerate to about 60
-        usleep( (int) (.01666 - deltaTime) * 1000000.0 );
+        // float framerate = 60.0;
+        // usleep( (int) ( .01666 - deltaTime) * 1000000.0 );
+
+        // usleep(1000000);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
