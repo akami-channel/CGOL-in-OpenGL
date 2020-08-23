@@ -18,8 +18,9 @@
 
 #define FALSE 0
 #define TRUE 1
+
 #define FULLSCREEN FALSE
-#define WRITING_TO_DISK TRUE
+#define WRITING_TO_DISK FALSE
 
 GLuint initial_screen_width = 600, initial_screen_height = 600;
 const GLFWvidmode* mode;
@@ -189,17 +190,17 @@ int main (int argc, char* argv[]){
 
     setupVAO();
     glBindVertexArray(VAO); 
-    textured_quad_shader = glCreateProgram();
-    buildShaders(textured_quad_shader, "shaders/textured_quad.vs", "shaders/textured_quad.fs");
+    // textured_quad_shader = glCreateProgram();
+    // buildShaders(textured_quad_shader, "shaders/textured_quad.vs", "shaders/textured_quad.fs");
 
-    GLuint sprite_shader = glCreateProgram();
-    buildShaders(sprite_shader, "shaders/sprite.vs", "shaders/sprite.fs");
+    // GLuint sprite_shader = glCreateProgram();
+    // buildShaders(sprite_shader, "shaders/sprite.vs", "shaders/sprite.fs");
 
-    GLuint resting_sprite_shader = glCreateProgram();
-    buildShaders(resting_sprite_shader, "shaders/resting_sprite.vs", "shaders/resting_sprite.fs");
+    // GLuint resting_sprite_shader = glCreateProgram();
+    // buildShaders(resting_sprite_shader, "shaders/resting_sprite.vs", "shaders/resting_sprite.fs");
 
-    GLuint walking_zombie_shader = glCreateProgram();
-    buildShaders(walking_zombie_shader, "shaders/walking_zombie.vs", "shaders/walking_zombie.fs");
+    // GLuint walking_zombie_shader = glCreateProgram();
+    // buildShaders(walking_zombie_shader, "shaders/walking_zombie.vs", "shaders/walking_zombie.fs");
 
     GLuint colored_quad_shader = glCreateProgram();
     buildShaders(colored_quad_shader, "shaders/colored_quad.vs", "shaders/colored_quad.fs");
@@ -320,7 +321,7 @@ int main (int argc, char* argv[]){
             float height = 2.0 / screen_height_float; 
             glUniform2f(glGetUniformLocation(colored_quad_shader, "trans"), (float)x * width - 1.0, (float)y * height - 1.0);
             glUniform2f(glGetUniformLocation(colored_quad_shader, "scale"), width, height);
-            glUniform4f(glGetUniformLocation(colored_quad_shader, "color"), (float)x * width / 2.0, (float)y * height / 2.0, 1.0, 1.0);
+            glUniform4f(glGetUniformLocation(colored_quad_shader, "color"), (float)x * width / 2.0, (float)y * height / 2.0, 1.0, 1.0); // 0.0, 0.0, 1.0, 1.0
             if(cells[i].is_alive == 1) glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             // if(x == 1 && y == 1) glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);    
@@ -356,10 +357,10 @@ int main (int argc, char* argv[]){
     }
 
     // Optional cleaning up bc OS will likely do it for us, but is a good practice. Note that shaders are deleted in shader.h
-    glDeleteProgram(textured_quad_shader);
-    glDeleteProgram(sprite_shader);
-    glDeleteProgram(resting_sprite_shader);
-    glDeleteProgram(walking_zombie_shader);
+    // glDeleteProgram(textured_quad_shader);
+    // glDeleteProgram(sprite_shader);
+    // glDeleteProgram(resting_sprite_shader);
+    // glDeleteProgram(walking_zombie_shader);
     glDeleteProgram(colored_quad_shader);
     free(cells);
     free(cells_copy);
